@@ -15,7 +15,7 @@
             }
         }
 
-        public static double Trace(this Matrix2D matrix, int size)
+        public static double GetTrace(this Matrix2D matrix)
         {
             double sum = 0;
 

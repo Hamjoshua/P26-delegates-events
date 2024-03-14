@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace app.Matrix
 {
     [Serializable]
     public class Matrix2D : IComparable, IComparable<Matrix2D>
     {
+
+
         private double[,] _items;
         public int RowsCount
         {
@@ -21,15 +24,15 @@ namespace app.Matrix
             }
         }
 
-        public double[] this[int RowIndex]
+        public double[] this[int rowIndex]
         {
             get
             {
                 double[] ThisRow = new double[ColumnsCount];
 
-                for(int ColumnIndex = 0; ColumnIndex < ColumnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < ColumnsCount; ++columnIndex)
                 {
-                    ThisRow[ColumnIndex] = _items[RowIndex, ColumnIndex];
+                    ThisRow[columnIndex] = _items[rowIndex, columnIndex];
                 }
                 return ThisRow;
             }
@@ -38,9 +41,9 @@ namespace app.Matrix
             {
                 if (value.GetLength(0) == ColumnsCount)
                 {
-                    for (int ColumnIndex = 0; ColumnIndex < ColumnsCount; ++ColumnIndex) 
+                    for (int columnIndex = 0; columnIndex < ColumnsCount; ++columnIndex)
                     {
-                        this[RowIndex, ColumnIndex] = value[ColumnIndex];
+                        this[rowIndex, columnIndex] = value[columnIndex];
                     };
                 }
                 else
@@ -50,16 +53,16 @@ namespace app.Matrix
             }
         }
 
-        public double this[int RowIndex, int ColumnIndex]
+        public double this[int rowIndex, int columnIndex]
         {
             get
             {
-                return _items[RowIndex, ColumnIndex];
+                return _items[rowIndex, columnIndex];
             }
 
             set
             {
-                _items[RowIndex, ColumnIndex] = value;
+                _items[rowIndex, columnIndex] = value;
             }
         }
 
@@ -67,11 +70,11 @@ namespace app.Matrix
         public Matrix2D Clone()
         {
             Matrix2D NewMatrix = new Matrix2D(RowsCount, ColumnsCount);
-            for(int RowIndex = 0; RowIndex < RowsCount; ++RowIndex)
+            for (int rowIndex = 0; rowIndex < RowsCount; ++rowIndex)
             {
-                for(int ColumnIndex = 0; ColumnIndex < ColumnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < ColumnsCount; ++columnIndex)
                 {
-                    NewMatrix[RowIndex, ColumnIndex] = this[RowIndex, ColumnIndex];
+                    NewMatrix[rowIndex, columnIndex] = this[rowIndex, columnIndex];
                 }
             }
             return NewMatrix;
@@ -80,24 +83,24 @@ namespace app.Matrix
         public override string ToString()
         {
             string StringMatrix = "[";
-            for (int RowIndex = 0; RowIndex < RowsCount; ++RowIndex)
+            for (int rowIndex = 0; rowIndex < RowsCount; ++rowIndex)
             {
-                double[] Columns = this[RowIndex];
+                double[] Columns = this[rowIndex];
 
                 StringMatrix += "[";
-                for (int ColumnIndex = 0; ColumnIndex < ColumnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < ColumnsCount; ++columnIndex)
                 {
-                    StringMatrix += Columns[ColumnIndex].ToString();
-                    if (ColumnIndex < ColumnsCount - 1)
+                    StringMatrix += Columns[columnIndex].ToString();
+                    if (columnIndex < ColumnsCount - 1)
                     {
-                        StringMatrix += ", ";
-                    }                    
+                        StringMatrix += ",";
+                    }
                 }
                 StringMatrix += "]";
 
-                if (RowIndex < RowsCount - 1)
+                if (rowIndex < RowsCount - 1)
                 {
-                    StringMatrix += ",\n";
+                    StringMatrix += ",";
                 }
             }
             StringMatrix += "]";
@@ -141,9 +144,9 @@ namespace app.Matrix
             if (obj is Matrix2D)
             {
                 Matrix2D matrix = obj as Matrix2D;
-                for (int RowIndex = 0; RowIndex < matrix.RowsCount; ++RowIndex)
+                for (int rowIndex = 0; rowIndex < matrix.RowsCount; ++rowIndex)
                 {
-                    if (this[RowIndex] != matrix[RowIndex])
+                    if (this[rowIndex] != matrix[rowIndex])
                     {
                         return false;
                     }
@@ -161,11 +164,42 @@ namespace app.Matrix
         public Matrix2D(int rowsCount, int columnsCount)
         {
             _items = new double[rowsCount, columnsCount];
-            for (int RowIndex = 0; RowIndex < rowsCount; ++RowIndex)
+            for (int rowIndex = 0; rowIndex < rowsCount; ++rowIndex)
             {
-                for (int ColumnIndex = 0; ColumnIndex < columnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < columnsCount; ++columnIndex)
                 {
-                    _items[RowIndex, ColumnIndex] = 0;
+                    _items[rowIndex, columnIndex] = 0;
+                }
+            }
+        }
+
+        static public Matrix2D ParseMatrix(string parseString)
+        {
+            try
+            {
+                Matrix2D matrix = new Matrix2D(parseString);
+                return matrix;
+            }
+            catch
+            {
+                return null;
+            }
+
+        }
+
+        private Matrix2D(string parseString)
+        {
+            var stringRows = Regex.Matches(parseString, @"(\b[^\[]+\b)");
+            _items = new double[stringRows.Count, stringRows.Count];
+
+            for (int rowIndex = 0; rowIndex < stringRows.Count; ++rowIndex)
+            {
+                string stringRow = stringRows[rowIndex].Value;
+                string[] splittedNumbers = stringRow.Split(',');
+                for (int columnIndex = 0; columnIndex < stringRows.Count; ++columnIndex)
+                {
+                    double parsedNumber = Convert.ToDouble(splittedNumbers[columnIndex]);
+                    _items[rowIndex, columnIndex] = parsedNumber;
                 }
             }
         }
@@ -174,23 +208,23 @@ namespace app.Matrix
         {
             Random RandomObject = new Random();
             _items = new double[rowsCount, columnsCount];
-            for (int RowIndex = 0; RowIndex < rowsCount; ++RowIndex)
+            for (int rowIndex = 0; rowIndex < rowsCount; ++rowIndex)
             {
-                for (int ColumnIndex = 0; ColumnIndex < columnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < columnsCount; ++columnIndex)
                 {
                     double RandomNumber = RandomObject.Next(maxNumberForRandom);
-                    _items[RowIndex, ColumnIndex] = RandomNumber;
+                    _items[rowIndex, columnIndex] = RandomNumber;
                 }
             }
         }
 
-        public double[] GetColumn(int ColumnIndex)
+        public double[] GetColumn(int columnIndex)
         {
             double[] ThisColumn = new double[RowsCount];
-            for (int RowIndex = 0; RowIndex < this.RowsCount; ++RowIndex)
+            for (int rowIndex = 0; rowIndex < this.RowsCount; ++rowIndex)
             {
-                double CurrentColumnElement = this[RowIndex, ColumnIndex];
-                ThisColumn[RowIndex] = CurrentColumnElement;
+                double CurrentColumnElement = this[rowIndex, columnIndex];
+                ThisColumn[rowIndex] = CurrentColumnElement;
             }
             return ThisColumn;
         }
@@ -201,14 +235,14 @@ namespace app.Matrix
             {
                 throw new DifferentMatrixesException("Матрицы не совпадают по размеру");
             }
-
-            for (int RowIndex = 0; RowIndex < firstMatrix.RowsCount; ++RowIndex)
+            Matrix2D NewMatrix = firstMatrix.Clone();
+            for (int rowIndex = 0; rowIndex < firstMatrix.RowsCount; ++rowIndex)
             {
-                for (int ColumnIndex = 0; ColumnIndex < firstMatrix.ColumnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < firstMatrix.ColumnsCount; ++columnIndex)
                 {
                     double NewValue = 0;
-                    double FirstElement = firstMatrix[RowIndex, ColumnIndex];
-                    double SecondElement = secondMatrix[RowIndex, ColumnIndex];
+                    double FirstElement = firstMatrix[rowIndex, columnIndex];
+                    double SecondElement = secondMatrix[rowIndex, columnIndex];
 
                     if (plus)
                     {
@@ -219,7 +253,7 @@ namespace app.Matrix
                         NewValue = FirstElement - SecondElement;
                     }
 
-                    firstMatrix[RowIndex, ColumnIndex] = NewValue;
+                    firstMatrix[rowIndex, columnIndex] = NewValue;
                 }
             }
 
@@ -240,11 +274,11 @@ namespace app.Matrix
         public static Matrix2D operator *(Matrix2D matrix, double number)
         {
             Matrix2D NewMatrix = matrix.Clone();
-            for (int RowIndex = 0; RowIndex < matrix.RowsCount; ++RowIndex)
+            for (int rowIndex = 0; rowIndex < matrix.RowsCount; ++rowIndex)
             {
-                for (int ColumnIndex = 0; ColumnIndex < matrix.ColumnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < matrix.ColumnsCount; ++columnIndex)
                 {
-                    NewMatrix[RowIndex, ColumnIndex] *= number;
+                    NewMatrix[rowIndex, columnIndex] *= number;
                 }
             }
             return NewMatrix;
@@ -253,11 +287,11 @@ namespace app.Matrix
         public static Matrix2D operator /(Matrix2D matrix, double number)
         {
             Matrix2D NewMatrix = matrix.Clone();
-            for (int RowIndex = 0; RowIndex < matrix.RowsCount; ++RowIndex)
+            for (int rowIndex = 0; rowIndex < matrix.RowsCount; ++rowIndex)
             {
-                for (int ColumnIndex = 0; ColumnIndex < matrix.ColumnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < matrix.ColumnsCount; ++columnIndex)
                 {
-                    NewMatrix[RowIndex, ColumnIndex] /= number;
+                    NewMatrix[rowIndex, columnIndex] /= number;
                 }
             }
             return NewMatrix;
@@ -287,13 +321,13 @@ namespace app.Matrix
 
             Matrix2D NewMatrix = new Matrix2D(firstMatrix.RowsCount, secondMatrix.ColumnsCount);
 
-            for (int FirstRowIndex = 0; FirstRowIndex < firstMatrix.RowsCount; ++FirstRowIndex)
+            for (int FirstrowIndex = 0; FirstrowIndex < firstMatrix.RowsCount; ++FirstrowIndex)
             {
-                double[] FirstRow = firstMatrix[FirstRowIndex];
+                double[] FirstRow = firstMatrix[FirstrowIndex];
 
-                for (int SecondColumnIndex = 0; SecondColumnIndex < secondMatrix.ColumnsCount; ++SecondColumnIndex)
+                for (int SecondcolumnIndex = 0; SecondcolumnIndex < secondMatrix.ColumnsCount; ++SecondcolumnIndex)
                 {
-                    double[] SecondColumn = secondMatrix.GetColumn(SecondColumnIndex);
+                    double[] SecondColumn = secondMatrix.GetColumn(SecondcolumnIndex);
                     double SumElement = 0;
 
                     for (int CurrentElementIndex = 0; CurrentElementIndex < secondMatrix.RowsCount; ++CurrentElementIndex)
@@ -302,7 +336,7 @@ namespace app.Matrix
                         SumElement += CurrentElement;
                     }
 
-                    NewMatrix[FirstRowIndex, SecondColumnIndex] = SumElement;
+                    NewMatrix[FirstrowIndex, SecondcolumnIndex] = SumElement;
                 }
             }
 
@@ -341,29 +375,29 @@ namespace app.Matrix
             return Result == -1 || Result == 0;
         }
 
-        public Matrix2D RemoveRowAt(int ForbiddenRowIndex)
+        public Matrix2D RemoveRowAt(int ForbiddenrowIndex)
         {
             Matrix2D NewMatrix = new Matrix2D(RowsCount - 1, ColumnsCount);
-            bool ForbiddenRowIndexDetected = false;
-            for(int RowIndex = 0; RowIndex < RowsCount; ++RowIndex)
+            bool ForbiddenrowIndexDetected = false;
+            for (int rowIndex = 0; rowIndex < RowsCount; ++rowIndex)
             {
-                for(int ColumnIndex = 0; ColumnIndex < ColumnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < ColumnsCount; ++columnIndex)
                 {
-                    if(RowIndex != ForbiddenRowIndex)
+                    if (rowIndex != ForbiddenrowIndex)
                     {
-                        double ValueFromOldMatrix = this[RowIndex, ColumnIndex];
-                        if (ForbiddenRowIndexDetected)
+                        double ValueFromOldMatrix = this[rowIndex, columnIndex];
+                        if (ForbiddenrowIndexDetected)
                         {
-                            NewMatrix[RowIndex - 1, ColumnIndex] = ValueFromOldMatrix;
+                            NewMatrix[rowIndex - 1, columnIndex] = ValueFromOldMatrix;
                         }
                         else
                         {
-                            NewMatrix[RowIndex, ColumnIndex] = ValueFromOldMatrix;
+                            NewMatrix[rowIndex, columnIndex] = ValueFromOldMatrix;
                         }
                     }
                     else
                     {
-                        ForbiddenRowIndexDetected = true;
+                        ForbiddenrowIndexDetected = true;
                         break;
                     }
                 }
@@ -371,32 +405,32 @@ namespace app.Matrix
             return NewMatrix;
         }
 
-        public Matrix2D RemoveColumnAt(int ForbiddenColumnIndex)
+        public Matrix2D RemoveColumnAt(int ForbiddencolumnIndex)
         {
             Matrix2D NewMatrix = new Matrix2D(RowsCount, ColumnsCount - 1);
-            bool ForbiddenColumnIndexDetected = false;
-            for (int RowIndex = 0; RowIndex < RowsCount; ++RowIndex)
+            bool ForbiddencolumnIndexDetected = false;
+            for (int rowIndex = 0; rowIndex < RowsCount; ++rowIndex)
             {
-                for (int ColumnIndex = 0; ColumnIndex < ColumnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < ColumnsCount; ++columnIndex)
                 {
-                    if (ColumnIndex != ForbiddenColumnIndex)
+                    if (columnIndex != ForbiddencolumnIndex)
                     {
-                        double ValueFromOldMatrix = this[RowIndex, ColumnIndex];
-                        if (ForbiddenColumnIndexDetected)
+                        double ValueFromOldMatrix = this[rowIndex, columnIndex];
+                        if (ForbiddencolumnIndexDetected)
                         {
-                            NewMatrix[RowIndex, ColumnIndex - 1] = ValueFromOldMatrix;
+                            NewMatrix[rowIndex, columnIndex - 1] = ValueFromOldMatrix;
                         }
                         else
                         {
-                            NewMatrix[RowIndex, ColumnIndex] = ValueFromOldMatrix;
+                            NewMatrix[rowIndex, columnIndex] = ValueFromOldMatrix;
                         }
                     }
                     else
                     {
-                        ForbiddenColumnIndexDetected = true;
+                        ForbiddencolumnIndexDetected = true;
                     }
                 }
-                ForbiddenColumnIndexDetected = false;
+                ForbiddencolumnIndexDetected = false;
             }
             return NewMatrix;
         }
@@ -424,11 +458,11 @@ namespace app.Matrix
             }
             else
             {
-                for (int ColumnIndex = 0; ColumnIndex < Matrix.ColumnsCount; ++ColumnIndex)
+                for (int columnIndex = 0; columnIndex < Matrix.ColumnsCount; ++columnIndex)
                 {
-                    double Minor = Math.Pow(-1, ColumnIndex);
-                    double ColumnNumber = Minor * Matrix[0, ColumnIndex];
-                    Matrix2D SubMatrix = GetSubMatrix(ColumnIndex, Matrix);
+                    double Minor = Math.Pow(-1, columnIndex);
+                    double ColumnNumber = Minor * Matrix[0, columnIndex];
+                    Matrix2D SubMatrix = GetSubMatrix(columnIndex, Matrix);
 
                     Determinant += ColumnNumber * _GetDeterminant(SubMatrix);
                 }
@@ -442,46 +476,46 @@ namespace app.Matrix
             if (GetDeterminant() > 0)
             {
                 Matrix2D OnesMatrix = new Matrix2D(RowsCount, RowsCount);
-                for (int RowColumnIndex = 0; RowColumnIndex < RowsCount; ++RowColumnIndex)
+                for (int RowcolumnIndex = 0; RowcolumnIndex < RowsCount; ++RowcolumnIndex)
                 {
-                    OnesMatrix[RowColumnIndex, RowColumnIndex] = 1;
+                    OnesMatrix[RowcolumnIndex, RowcolumnIndex] = 1;
                 }
 
-                int RowIndex = 0;
-                while (RowIndex < RowsCount + 1)
+                int rowIndex = 0;
+                while (rowIndex < RowsCount + 1)
                 {
 
-                    if (RowIndex != 0)
+                    if (rowIndex != 0)
                     {
-                        int PreviousColumnIndex = RowIndex - 1;
-                        for (int NextRowIndex = 0; NextRowIndex < RowsCount; ++NextRowIndex)
+                        int PreviouscolumnIndex = rowIndex - 1;
+                        for (int NextrowIndex = 0; NextrowIndex < RowsCount; ++NextrowIndex)
                         {
-                            if (NextRowIndex == PreviousColumnIndex)
+                            if (NextrowIndex == PreviouscolumnIndex)
                             {
                                 continue;
                             }
-                            double PreviousElement = this[NextRowIndex, PreviousColumnIndex];
-                            for (int ColumnIndex = 0; ColumnIndex < ColumnsCount; ++ColumnIndex)
+                            double PreviousElement = this[NextrowIndex, PreviouscolumnIndex];
+                            for (int columnIndex = 0; columnIndex < ColumnsCount; ++columnIndex)
                             {
-                                this[NextRowIndex, ColumnIndex] -= this[PreviousColumnIndex, ColumnIndex] * PreviousElement;
-                                OnesMatrix[NextRowIndex, ColumnIndex] -= OnesMatrix[PreviousColumnIndex, ColumnIndex] * PreviousElement;
+                                this[NextrowIndex, columnIndex] -= this[PreviouscolumnIndex, columnIndex] * PreviousElement;
+                                OnesMatrix[NextrowIndex, columnIndex] -= OnesMatrix[PreviouscolumnIndex, columnIndex] * PreviousElement;
                             }
                         }
                     }
 
-                    if (RowIndex == RowsCount)
+                    if (rowIndex == RowsCount)
                     {
                         break;
                     }
-                    double LeadElement = this[RowIndex, RowIndex];
+                    double LeadElement = this[rowIndex, rowIndex];
 
                     Matrix2D MatrixDividedOnLeadElement = this / LeadElement;
-                    this[RowIndex] = MatrixDividedOnLeadElement[RowIndex];
+                    this[rowIndex] = MatrixDividedOnLeadElement[rowIndex];
 
                     Matrix2D OnesDividedOnLeadElement = OnesMatrix / LeadElement;
-                    OnesMatrix[RowIndex] = OnesDividedOnLeadElement[RowIndex];
+                    OnesMatrix[rowIndex] = OnesDividedOnLeadElement[rowIndex];
 
-                    RowIndex++;
+                    rowIndex++;
                 }
                 return OnesMatrix;
             }

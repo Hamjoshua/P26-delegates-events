@@ -38,6 +38,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
@@ -46,7 +47,9 @@
     <Content Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChainResponsobility.cs" />
     <Compile Include="Exceptions.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Library.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
