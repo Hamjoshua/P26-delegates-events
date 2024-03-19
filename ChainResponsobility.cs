@@ -5,9 +5,9 @@ using System;
 namespace app.Chain
 {
     public delegate void Diagonalize(Matrix2D matrix);
-    
+
     public abstract class IEvent
-    {       
+    {
         public object[] Args;
     }
 
@@ -23,13 +23,13 @@ namespace app.Chain
     public abstract class BaseHandler
     {
         public BaseHandler() { Next = null; }
-        public abstract object Do(IEvent ev);
+        public abstract object Execute(IEvent ev);
 
         public virtual void Handle(IEvent ev)
         {
             if (ev.Args.Length == ArgsCount)
             {
-                object resultObject = Do(ev);
+                object resultObject = Execute(ev);
                 if (resultObject != null)
                 {
                     Console.WriteLine($"Результат операции: {resultObject}");
@@ -53,7 +53,9 @@ namespace app.Chain
         {
             Next = newHandler;
         }
+
         protected BaseHandler Next { get; set; }
+
         protected int ArgsCount;
     }
 
@@ -64,7 +66,7 @@ namespace app.Chain
             ArgsCount = 1;
             Next = new TwoArgsHandler();
         }
-        public override object Do(IEvent ev)
+        public override object Execute(IEvent ev)
         {
             string operation = (string)ev.Args[0];
             if ("create".Contains(operation))
@@ -96,7 +98,7 @@ namespace app.Chain
                 }
             };
         }
-        public override object Do(IEvent ev)
+        public override object Execute(IEvent ev)
         {
             string operation = (string)ev.Args[0];
             string matrixString = (string)ev.Args[1];
@@ -112,19 +114,23 @@ namespace app.Chain
                 matrix.Transpose();
                 return matrix;
             }
-            else if ("trace".Contains(operation))
+
+            if ("trace".Contains(operation))
             {
                 return matrix.GetTrace();
             }
-            else if ("discriminant".Contains(operation))
+
+            if ("discriminant".Contains(operation))
             {
                 return matrix.GetDeterminant();
             }
-            else if ("reverse".Contains(operation))
+
+            if ("reverse".Contains(operation))
             {
                 return matrix.Reverse();
             }
-            else if ("diagonalize".Contains(operation))
+
+            if ("diagonalize".Contains(operation))
             {
                 diagonalize(matrix);
                 return matrix;
@@ -140,7 +146,7 @@ namespace app.Chain
         {
             ArgsCount = 3;
         }
-        public override object Do(IEvent ev)
+        public override object Execute(IEvent ev)
         {
             string firstMatrixString = (string)ev.Args[0];
             string secondMatrixString = (string)ev.Args[2];
