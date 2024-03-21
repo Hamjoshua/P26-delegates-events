@@ -23,13 +23,13 @@ namespace app.Chain
     public abstract class BaseHandler
     {
         public BaseHandler() { Next = null; }
-        public abstract object Execute(IEvent ev);
+        public abstract object Execute(IEvent @event);
 
-        public virtual void Handle(IEvent ev)
+        public virtual void Handle(IEvent @event)
         {
-            if (ev.Args.Length == ArgsCount)
+            if (@event.Args.Length == ArgsCount)
             {
-                object resultObject = Execute(ev);
+                object resultObject = Execute(@event);
                 if (resultObject != null)
                 {
                     Console.WriteLine($"Результат операции: {resultObject}");
@@ -41,7 +41,7 @@ namespace app.Chain
             Console.WriteLine("Sending event to next Handler...");
             if (Next != null)
             {
-                Next.Handle(ev);
+                Next.Handle(@event);
             }
             else
             {
@@ -66,9 +66,9 @@ namespace app.Chain
             ArgsCount = 1;
             Next = new TwoArgsHandler();
         }
-        public override object Execute(IEvent ev)
+        public override object Execute(IEvent @event)
         {
-            string operation = (string)ev.Args[0];
+            string operation = (string)@event.Args[0];
             if ("create".Contains(operation))
             {
                 return new Matrix2D(3, 3, 10);
@@ -98,10 +98,10 @@ namespace app.Chain
                 }
             };
         }
-        public override object Execute(IEvent ev)
+        public override object Execute(IEvent @event)
         {
-            string operation = (string)ev.Args[0];
-            string matrixString = (string)ev.Args[1];
+            string operation = (string)@event.Args[0];
+            string matrixString = (string)@event.Args[1];
 
             Matrix2D matrix = Matrix2D.ParseMatrix(matrixString);
             if (matrix == null)
@@ -146,10 +146,10 @@ namespace app.Chain
         {
             ArgsCount = 3;
         }
-        public override object Execute(IEvent ev)
+        public override object Execute(IEvent @event)
         {
-            string firstMatrixString = (string)ev.Args[0];
-            string secondMatrixString = (string)ev.Args[2];
+            string firstMatrixString = (string)@event.Args[0];
+            string secondMatrixString = (string)@event.Args[2];
 
             Matrix2D firstMatrix = Matrix2D.ParseMatrix(firstMatrixString);
             if (firstMatrix == null)
@@ -163,7 +163,7 @@ namespace app.Chain
             {
                 try
                 {
-                    number = Convert.ToDouble(ev.Args[2]);
+                    number = Convert.ToDouble(@event.Args[2]);
                 }
                 catch
                 {
@@ -171,7 +171,7 @@ namespace app.Chain
                 }
             }
 
-            string operation = (string)ev.Args[1];
+            string operation = (string)@event.Args[1];
 
             Matrix2D newMatrix = null;
             if (secondMatrix == null || secondMatrix.ColumnsCount == 1)
@@ -219,9 +219,9 @@ namespace app.Chain
             HandleEvent(appEvent);
         }
 
-        private void HandleEvent(IEvent ev)
+        private void HandleEvent(IEvent @event)
         {
-            _eventHandler.Handle(ev);
+            _eventHandler.Handle(@event);
         }
     }
 }
